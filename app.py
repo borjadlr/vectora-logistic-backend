@@ -7,6 +7,7 @@ import json
 app = Flask(__name__)
 CORS(app)
 
+# Obtener la clave de la variable de entorno
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/procesar", methods=["POST"])
@@ -28,19 +29,27 @@ Tabla:
 {tabla}
 """
 
-    respuesta = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
-    )
-
-    contenido = respuesta.choices[0].message["content"]
     try:
+        respuesta = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )
+
+        contenido = respuesta.choices[0].message["content"]
+
+        # Intentar parsear como JSON
         rutas = json.loads(contenido)
-    except Exception:
-        rutas = {"error": "La respuesta no era JSON válido", "bruto": contenido}
+
+    except Exception as e:
+        rutas = {
+            "error": "La respuesta no era JSON válido o hubo un error de conexión.",
+            "detalle": str(e),
+            "bruto": locals().get("contenido", "")
+        }
 
     return jsonify(rutas)
-    
+
+# Arranque para Railway
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
