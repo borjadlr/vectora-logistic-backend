@@ -1,14 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import openai
+from openai import OpenAI
 import os
 import json
 
 app = Flask(__name__)
 CORS(app)
 
-# Obtener la clave de la variable de entorno
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.route("/procesar", methods=["POST"])
 def procesar():
@@ -30,15 +29,13 @@ Tabla:
 """
 
     try:
-        respuesta = openai.ChatCompletion.create(
+        respuesta = client.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
         )
 
-        contenido = respuesta.choices[0].message["content"]
-
-        # Intentar parsear como JSON
+        contenido = respuesta.choices[0].message.content
         rutas = json.loads(contenido)
 
     except Exception as e:
@@ -50,6 +47,5 @@ Tabla:
 
     return jsonify(rutas)
 
-# Arranque para Railway
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
