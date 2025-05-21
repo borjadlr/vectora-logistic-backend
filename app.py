@@ -41,3 +41,6 @@ Tabla:
         rutas = {"error": "La respuesta no era JSON válido", "bruto": contenido}
 
     return jsonify(rutas)
+    
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)
