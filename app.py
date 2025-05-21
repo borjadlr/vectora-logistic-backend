@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from openai import OpenAI
+import openai
 import os
 import json
 
 app = Flask(__name__)
 CORS(app)
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Configurar la clave directamente desde la variable de entorno
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/procesar", methods=["POST"])
 def procesar():
@@ -29,7 +30,7 @@ Tabla:
 """
 
     try:
-        respuesta = client.chat.completions.create(
+        respuesta = openai.chat.completions.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.3
