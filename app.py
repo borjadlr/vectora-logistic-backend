@@ -7,7 +7,6 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-# Configurar la clave directamente desde la variable de entorno
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 @app.route("/procesar", methods=["POST"])
@@ -30,12 +29,11 @@ Tabla:
 """
 
     try:
-       respuesta = openai.chat.completions.create(
-        model="gpt-3.5-turbo",  
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.3
-    )
-
+        respuesta = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3
+        )
 
         contenido = respuesta.choices[0].message.content
         rutas = json.loads(contenido)
@@ -50,4 +48,4 @@ Tabla:
     return jsonify(rutas)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.
